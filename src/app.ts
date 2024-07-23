@@ -1,9 +1,22 @@
-const express = require('express');
+import * as db from './models/connector'
+import API from './api'
+import { logger } from './utils/logger'
 
-const app = express();
 
-app.set('port', 5000);
+(async () => {
+    await db.connect()
+    const api = new API()
 
-app.listen(app.get('port'), () => {
-    console.log('server start');
-})
+    api.listen()
+
+    async function shutdown() {
+        logger.info('gracefully shutdown')
+        await Promise.all([api.close])
+        await db.close()
+        logger.info('shutdown complete')
+        process.exit()
+    }
+
+    process.on('SIGINT', shutdown)
+    process.on('SIGTERM', shutdown)
+})()
