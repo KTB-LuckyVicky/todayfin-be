@@ -3,13 +3,13 @@ import * as mysql from 'mysql2/promise'
 
 config({ path: `.env` })
 
-const password = process.env.PASSWORD
+const passwd = process.env.PASSWORD
 
-export const pool = mysql.createPool( {
+export const conn = mysql.createConnection( {
     host: "localhost",
     port: 3306,
     user: "root",
-    password: password,
+    password: passwd,
     database: "TodayFin",
 })
 

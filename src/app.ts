@@ -4,7 +4,7 @@ import { logger } from './utils/logger'
 
 
 (async () => {
-    await db.connect()
+    //await db.connect()
     const api = new API()
 
     api.listen()
@@ -12,7 +12,7 @@ import { logger } from './utils/logger'
     async function shutdown() {
         logger.info('gracefully shutdown')
         await Promise.all([api.close])
-        await db.close()
+        //await db.close()
         logger.info('shutdown complete')
         process.exit()
     }

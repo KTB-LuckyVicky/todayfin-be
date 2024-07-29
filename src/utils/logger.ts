@@ -1,6 +1,6 @@
 import winston from 'winston'
 import winstonDaily from 'winston-daily-rotate-file'
-import join from 'path'
+import { join } from 'path'
 import {existsSync, mkdirSync} from 'fs'
 // import expressWinston from 'express-winston'
 
@@ -23,7 +23,7 @@ const winstonOption = {
         winston.format.errors({ stack: true }),
         winston.format.prettyPrint(),
     ),
-    transport: [
+    transports: [
         new winstonDaily({ //error 레벨 로그
             level: 'error',
             datePattern: 'YYYY-MM-DD',
@@ -43,31 +43,5 @@ const winstonOption = {
         new winston.transports.Console(),
     ],
 }
-
-//TODO: 이 부분 더 알아오기
-/*
-const loggerMiddleware = expressWinston.logger({
-    ...winstonOption,
-    requestWhitelist: ['headers.origin', 'body', 'query'],
-    responseWhitelist: ['body', 'statusCode'],
-    bodyBlacklist: ['password', 'clientSecret', 'token', 'jwt', 'jwtPayload'],
-    headerBlacklist: ['authorization'],
-    ignoreRoute: function (req, res) {
-        return false
-    },
-    level: function (req, res) {
-        if (res.statusCode >= 500) {
-            return 'error'
-        } else if (res.statusCode >= 400) {
-            return 'warn'
-        }
-        return 'info'
-    },
-    meta: true,
-    dynamicMeta: function (req, res) {
-        return res.meta
-    },
-})
- */
 
 export const logger = winston.createLogger(winstonOption)

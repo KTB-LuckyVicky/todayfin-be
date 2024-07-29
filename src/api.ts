@@ -9,6 +9,7 @@ export default class API {
 
     constructor() {
         this.app = express()
+        this.server = http.createServer(this.app)
     }
 
     public listen() {
