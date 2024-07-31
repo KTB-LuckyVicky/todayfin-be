@@ -1,10 +1,9 @@
-import * as db from './models/connector'
+// import * as db from './models/connector'
 import API from './api'
 import { logger } from './utils/logger'
-
-
-(async () => {
-    //await db.connect()
+;(async () => {
+    //TODO : mongoDB 연결
+    // await db.connect()
     const api = new API()
 
     api.listen()
