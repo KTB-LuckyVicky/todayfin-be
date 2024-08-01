@@ -1,7 +1,10 @@
 import express from 'express'
 import http from 'http'
-import {logger} from './utils/logger'
-import { NODE_ENV, PORT } from './config'
+import { logger, loggerMiddleware } from '@/utils/logger'
+import { NODE_ENV, PORT } from '@/config'
+import controllers from '@/controllers'
+import middlewares from '@/middlewares'
+import cors from 'cors'
 
 export default class API {
     app: express.Application
@@ -9,7 +12,22 @@ export default class API {
 
     constructor() {
         this.app = express()
-        this.server = http.createServer(this.app)
+        this.setPreMiddleware()
+        this.setController()
+        this.setPostMiddleware()
+    }
+    setPreMiddleware() {
+        this.app.use(cors())
+        this.app.use(express.json())
+        this.app.use(express.urlencoded({ extended: true }))
+        this.app.use(loggerMiddleware)
+    }
+    setController() {
+        this.app.use('/user', controllers.user)
+    }
+
+    setPostMiddleware() {
+        this.app.use(middlewares.error)
     }
 
     public listen() {
@@ -19,8 +37,8 @@ export default class API {
     }
 
     public async close(): Promise<void> {
-        return new Promise((resolve) => {
-            this.server.close(()=> {
+        return new Promise(resolve => {
+            this.server.close(() => {
                 resolve()
             })
         })
