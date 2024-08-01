@@ -1,10 +1,9 @@
-import express, { Router, Request, Response, NextFunction } from 'express'
+import express, { Router, Request, Response } from 'express'
 import { conn } from '@/config'
-import asyncify from 'asyncify-express'
 import jwt from 'jsonwebtoken'
 import { verifyUser } from '@/middlewares/user'
 
-const router: Router = asyncify(express.Router())
+const router: Router = express.Router()
 
 router.get('/healthcheck', async (req: Request, res: Response) => {
     return res.status(200).send('ok')
@@ -54,13 +53,7 @@ router.put('/detail', verifyUser, async (req: Request, res: Response) => {
     } catch (err) {
         throw new Error('User update fail')
     }
-    res.status(200).json({
-        oauthProvider: req.user.oauthProvider,
-        oauthId: req.user.oauthId,
-        nickname: req.user.nickname,
-        name: req.user.name,
-        password: req.user.password,
-    })
+    res.sendStatus(204)
 })
 
 export default router

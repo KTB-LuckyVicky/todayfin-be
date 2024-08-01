@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { DB_URI, DB_NAME, conn } from '@/config'
+import { DB_URI, DB_NAME } from '@/config'
 import { logger } from '@/utils/logger'
 
 export async function connect() {
@@ -10,7 +10,6 @@ export async function connect() {
         throw new Error('DB connection error')
     }
     try {
-        const connection = await conn
         logger.info(`Successfully connect MySQL DB.`)
     } catch (err) {
         throw new Error('MySQL DB connection failed')
