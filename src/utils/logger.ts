@@ -1,12 +1,13 @@
 import winston from 'winston'
 import winstonDaily from 'winston-daily-rotate-file'
 import { join } from 'path'
-import {existsSync, mkdirSync} from 'fs'
-// import expressWinston from 'express-winston'
+import { existsSync, mkdirSync } from 'fs'
+import expressWinston from 'express-winston'
 
-const logDir: string = join(__dirname,'../../logs') // 경로 할당
+const logDir: string = join(__dirname, '../../logs') // 경로 할당
 
-if(!existsSync(logDir)){ //logs 디렉토리 존재하지 않을 경우 생성
+if (!existsSync(logDir)) {
+    //logs 디렉토리 존재하지 않을 경우 생성
     mkdirSync(logDir)
 }
 
@@ -24,7 +25,7 @@ const winstonOption = {
         winston.format.prettyPrint(),
     ),
     transports: [
-        new winstonDaily({ //error 레벨 로그
+        new winstonDaily({
             level: 'error',
             datePattern: 'YYYY-MM-DD',
             dirname: logDir,
@@ -32,7 +33,7 @@ const winstonOption = {
             maxFiles: 90,
             json: false,
         }),
-        new winstonDaily({ //
+        new winstonDaily({
             level: 'debug',
             datePattern: 'YYYY-MM-DD',
             dirname: logDir,
@@ -44,4 +45,29 @@ const winstonOption = {
     ],
 }
 
-export const logger = winston.createLogger(winstonOption)
+const loggerMiddleware = expressWinston.logger({
+    ...winstonOption,
+    requestWhitelist: ['headers.origin', 'body', 'query'],
+    responseWhitelist: ['body', 'statusCode'],
+    bodyBlacklist: ['password', 'token', 'jwt', 'jwtPayload'],
+    headerBlacklist: ['authorization'],
+    ignoreRoute: function (req, res) {
+        return false
+    },
+    level: function (req, res) {
+        if (res.statusCode >= 500) {
+            return 'error'
+        } else if (res.statusCode >= 400) {
+            return 'warn'
+        }
+        return 'info'
+    },
+    meta: true,
+    dynamicMeta: function (req, res) {
+        return res.meta
+    },
+})
+
+const logger = winston.createLogger(winstonOption)
+
+export { logger, loggerMiddleware }
