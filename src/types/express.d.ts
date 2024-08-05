@@ -1,4 +1,5 @@
 import { User } from '@/models/user'
+import { Community } from '@/models/community'
 
 declare global {
     namespace Express {
@@ -6,6 +7,7 @@ declare global {
             _routeWhitelists: { body: string[] }
             _routeBlacklists: { body: string[] }
             user: User
+            post: Community
         }
         interface Response {
             meta: {
