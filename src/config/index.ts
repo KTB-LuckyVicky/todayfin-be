@@ -1,17 +1,14 @@
 import { config } from 'dotenv'
 import * as mysql from 'mysql2/promise'
-import * as process from "node:process";
 
 config({ path: `.env` })
 
-const passwd = process.env.PASSWORD
-
 export const conn = mysql.createConnection({
-    host: 'localhost',
-    port: 3306,
-    user: 'root',
-    password: passwd,
-    database: 'TodayFin',
+    host: process.env.MYSQL_HOST,
+    port: Number(process.env.MYSQL_PORT),
+    user: process.env.MYSQL_USER,
+    password: process.env.MYSQL_PASSWORD,
+    database: process.env.MYSQL_DATABASE,
 })
 
 export const { DB_URI, DB_NAME, NODE_ENV } = process.env
