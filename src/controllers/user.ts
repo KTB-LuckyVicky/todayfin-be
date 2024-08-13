@@ -2,18 +2,28 @@ import express, { Router, Request, Response } from 'express'
 import { conn } from '@/config'
 import jwt from 'jsonwebtoken'
 import { verifyUser } from '@/middlewares/user'
+import crypto from 'crypto'
 
 const router: Router = express.Router()
+
+const createSalt = async () => {
+    return crypto.randomBytes(32).toString('base64')
+}
+const createHashPasswd = async (password: string, salt: string) => {
+    const hash = crypto.pbkdf2Sync(password, salt, 10169, 32, 'sha512')
+    return hash.toString('base64')
+}
 
 router.get('/healthcheck', async (req: Request, res: Response) => {
     return res.status(200).send('ok')
 })
 
 router.post('/signup', async (req: Request, res: Response) => {
-    const params = [req.body.oauthProvider, req.body.oauthId, req.body.nickname, req.body.name, req.body.password]
-    // TODO: 비밀번호 암호화
+    const salt = await createSalt()
+    const hash = await createHashPasswd(req.body.password, salt)
+    const params = [req.body.oauthProvider, req.body.oauthId, req.body.nickname, req.body.name, hash, salt]
     try {
-        ;(await conn).query('insert into User (oauthProvider, oauthId, nickname, name, password) VALUES (?, ?, ?, ?, ?)', params)
+        ;(await conn).query('insert into User (oauthProvider, oauthId, nickname, name, password, salt) VALUES (?, ?, ?, ?, ?, ?)', params)
     } catch (error) {
         throw new Error('SignUp is failed')
     }
@@ -21,20 +31,22 @@ router.post('/signup', async (req: Request, res: Response) => {
 })
 
 router.post('/signin', async (req: Request, res: Response) => {
-    const params = [req.body.oauthId, req.body.password]
-    try {
-        const [row] = await (await conn).query('select * from User where oauthId=? and password=?', params)
-        if (row != null) {
-            const user = row[0]
+    const [row] = await (await conn).query('select * from User where oauthId=?', req.body.oauthId)
+    if (row != null) {
+        const user = row[0]
+        const salt = user.salt
+        const storedHash = user.password
+
+        const inputHash = await createHashPasswd(req.body.password, salt)
+        if (inputHash === storedHash) {
             const token = jwt.sign({ oauthId: user.oauthId }, 'secret', { expiresIn: '1h' })
             res.status(200).json({ jwt: token })
         } else {
-            throw new Error('Can not find user')
+            res.sendStatus(401)
         }
-    } catch (error) {
-        throw new Error('SignUp is failed')
+    } else {
+        throw new Error('Can not find user')
     }
-    res.status(200)
 })
 
 router.get('/detail', verifyUser, async (req: Request, res: Response) => {
