@@ -12,4 +12,6 @@ export class User extends TimeStamps {
     public name: string
 
     public password: string
+
+    public salt: string
 }
