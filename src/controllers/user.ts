@@ -51,16 +51,15 @@ router.post('/signin', async (req: Request, res: Response) => {
 
 router.get('/detail', verifyUser, async (req: Request, res: Response) => {
     res.status(200).json({
-        _id: req.user._id,
         oauthId: req.user.oauthId,
         nickname: req.user.nickname,
         name: req.user.name,
-        password: req.user.password,
     })
 })
 
 router.put('/detail', verifyUser, async (req: Request, res: Response) => {
-    const params = [req.body.nickname, req.body.password]
+    const hash = await createHashPasswd(req.body.password, req.user.salt)
+    const params = [req.body.nickname, hash]
     try {
         ;(await conn).query('update User set nickname=?, password=?', params)
     } catch (err) {

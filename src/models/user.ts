@@ -14,4 +14,6 @@ export class User extends TimeStamps {
     public password: string
 
     public salt: string
+
+    public log: JSON
 }
