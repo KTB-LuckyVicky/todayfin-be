@@ -1,14 +1,14 @@
 import { config } from 'dotenv'
-import * as mysql from 'mysql2/promise'
+import * as maria from 'mariadb'
 
 config({ path: `.env` })
 
-export const conn = mysql.createConnection({
-    host: process.env.MYSQL_HOST,
-    port: Number(process.env.MYSQL_PORT),
-    user: process.env.MYSQL_USER,
-    password: process.env.MYSQL_PASSWORD,
-    database: process.env.MYSQL_DATABASE,
+export const conn = maria.createConnection({
+    host: process.env.MARIADB_HOST,
+    port: Number(process.env.MARIADB_PORT),
+    user: process.env.MARIADB_USER,
+    password: process.env.MARIADB_PASSWORD,
+    database: process.env.MARIADB_DATABASE,
 })
 
 export const { DB_URI, DB_NAME, NODE_ENV } = process.env

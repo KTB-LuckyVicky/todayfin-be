@@ -8,7 +8,9 @@ CREATE TABLE IF NOT EXISTS User (
     oauthId VARCHAR(30) NOT NULL,
     nickname VARCHAR(10) NOT NULL,
     name VARCHAR(10) NOT NULL,
-    password VARCHAR(20) NOT NULL
+    password VARCHAR(100) NOT NULL,
+    salt VARCHAR(100) NOT NULL,
+    log JSON NULL
 );
 
 CREATE TABLE IF NOT EXISTS Post (
