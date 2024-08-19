@@ -21,7 +21,7 @@ router.get('/', async (req: Request, res: Response) => {
     const page = Number(req.query.page || 1)
     const limit = Number(req.query.size || 20)
     const offset = (page - 1) * limit
-    const [posts] = await (await conn).query('select * from Post limit ? offset ?', [limit, offset])
+    const posts = await (await conn).query('select * from Post limit ? offset ?', [limit, offset])
 
     res.status(200).json({
         posts: posts,
@@ -33,8 +33,8 @@ router.get('/', async (req: Request, res: Response) => {
 })
 
 router.get('/:postId', async (req: Request, res: Response) => {
-    const [post] = await (await conn).query('select * from Post where _id = ?', req.params.postId)
-    res.json(post)
+    const post = await (await conn).query('select * from Post where _id = ?', req.params.postId)
+    res.json(post[0])
 })
 
 router.put('/:postId', verifyPostAuthor, async (req: Request, res: Response) => {

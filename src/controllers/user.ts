@@ -31,9 +31,10 @@ router.post('/signup', async (req: Request, res: Response) => {
 })
 
 router.post('/signin', async (req: Request, res: Response) => {
-    const [row] = await (await conn).query('select * from User where oauthId=?', req.body.oauthId)
+    const row = await (await conn).query('select * from User where oauthId=?', [req.body.oauthId])
     if (row != null) {
         const user = row[0]
+        console.log(user)
         const salt = user.salt
         const storedHash = user.password
 
