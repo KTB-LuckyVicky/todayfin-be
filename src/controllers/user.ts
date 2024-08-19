@@ -21,20 +21,23 @@ router.get('/healthcheck', async (req: Request, res: Response) => {
 router.post('/signup', async (req: Request, res: Response) => {
     const salt = await createSalt()
     const hash = await createHashPasswd(req.body.password, salt)
-    const params = [req.body.oauthProvider, req.body.oauthId, req.body.nickname, req.body.name, hash, salt]
+    const category = JSON.stringify(req.body.category)
+    const params = [req.body.oauthProvider, req.body.oauthId, req.body.nickname, req.body.name, hash, salt, category]
     try {
-        ;(await conn).query('insert into User (oauthProvider, oauthId, nickname, name, password, salt) VALUES (?, ?, ?, ?, ?, ?)', params)
+        ;(await conn).query(
+            'insert into User (oauthProvider, oauthId, nickname, name, password, salt, category) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            params,
+        )
     } catch (error) {
         throw new Error('SignUp is failed')
     }
-    res.status(201).send('ok')
+    res.sendStatus(201)
 })
 
 router.post('/signin', async (req: Request, res: Response) => {
     const row = await (await conn).query('select * from User where oauthId=?', [req.body.oauthId])
     if (row != null) {
         const user = row[0]
-        console.log(user)
         const salt = user.salt
         const storedHash = user.password
 
@@ -55,14 +58,16 @@ router.get('/detail', verifyUser, async (req: Request, res: Response) => {
         oauthId: req.user.oauthId,
         nickname: req.user.nickname,
         name: req.user.name,
+        category: req.user.category,
     })
 })
 
 router.put('/detail', verifyUser, async (req: Request, res: Response) => {
     const hash = await createHashPasswd(req.body.password, req.user.salt)
-    const params = [req.body.nickname, hash]
+    const category = JSON.stringify(req.body.category)
+    const params = [req.body.nickname, hash, category]
     try {
-        ;(await conn).query('update User set nickname=?, password=?', params)
+        ;(await conn).query('update User set nickname=?, password=?, category=?', params)
     } catch (err) {
         throw new Error('User update fail')
     }
