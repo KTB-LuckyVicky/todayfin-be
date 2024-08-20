@@ -49,10 +49,22 @@ pipeline {
                             -e MARIADB_PORT=${MARIADB_PORT} \
                             -e MARIADB_DATABASE=${MARIADB_DATABASE} \
                             -e DB_URI='${DB_URI}' \
-                            -e DB_NAME=${DB_NAME} \
                             --name todayfin-be \
                             ${ECR_REPO}:latest
                         """
+                    }
+                }
+            }
+        }
+        
+        stage('Check Application Health') {
+            steps {
+                script {
+                    def response = sh(script: "curl -s -o /dev/null -w '%{http_code}' http://localhost:5000/health", returnStdout: true).trim()
+                    if (response != '200') {
+                        error("Application health check failed with response code: ${response}")
+                    } else {
+                        echo "Application is healthy with response code: ${response}"
                     }
                 }
             }
