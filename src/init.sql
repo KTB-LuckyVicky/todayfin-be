@@ -10,7 +10,8 @@ CREATE TABLE IF NOT EXISTS User (
     name VARCHAR(10) NOT NULL,
     password VARCHAR(100) NOT NULL,
     salt VARCHAR(100) NOT NULL,
-    log JSON NULL
+    log JSON NULL,
+    category JSON NULL
 );
 
 CREATE TABLE IF NOT EXISTS Post (
