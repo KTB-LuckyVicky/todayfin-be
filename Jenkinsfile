@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'dev', url: "https://github.com/${REPO}.git"
+                git branch: 'feat/jenkins-greenblue', url: "https://github.com/${REPO}.git"
             }
         }
         
