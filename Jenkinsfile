@@ -5,6 +5,9 @@ pipeline {
         REPO = 'KTB-LuckyVicky/todayfin-be'
         ECR_REPO = '851725447172.dkr.ecr.ap-northeast-2.amazonaws.com/todayfinpractice'
         ECR_CREDENTIALS_ID = 'ecr:ap-northeast-2:ecr_credentials_id'
+        CURRENT_VERSION = "blue" // 현재 활성화된 버전 (green 또는 blue)
+        NEW_VERSION = CURRENT_VERSION == "green" ? "blue" : "green"
+        NEW_PORT = NEW_VERSION == "green" ? "5000" : "5001"
     }
 
     stages {
@@ -17,7 +20,7 @@ pipeline {
         stage('Build docker images') {
             steps {
                 script {
-                    dockerImage = docker.build("${ECR_REPO}:latest")
+                    dockerImage = docker.build("${ECR_REPO}:${NEW_VERSION}")
                 }
             }
         }
@@ -26,7 +29,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry("https://${ECR_REPO}", "${ECR_CREDENTIALS_ID}") {
-                        dockerImage.push('latest')
+                        dockerImage.push(NEW_VERSION)
                     }
                 }
             }
@@ -37,12 +40,12 @@ pipeline {
                 script {
                     docker.withRegistry("https://${ECR_REPO}", "${ECR_CREDENTIALS_ID}") {
                         
-                        sh "docker rm -f todayfin-be || true"
+                        sh "docker rm -f todayfin-be-${NEW_VERSION} || true"
                         
-                        sh "docker pull ${ECR_REPO}:latest"
+                        sh "docker pull ${ECR_REPO}:${NEW_VERSION}"
                         
                         sh """
-                        docker run -d -p 5000:5000 \
+                        docker run -d -p ${NEW_PORT}:5000 \
                             -e MARIADB_HOST=${MARIADB_HOST} \
                             -e MARIADB_PASSWORD=${MARIADB_PASSWORD} \
                             -e MARIADB_USER=${MARIADB_USER} \
@@ -50,10 +53,21 @@ pipeline {
                             -e MARIADB_DATABASE=${MARIADB_DATABASE} \
                             -e DB_NAME=${DB_NAME} \
                             -e DB_URI='${DB_URI}' \
-                            --name todayfin-be \
-                            ${ECR_REPO}:latest
+                            --name todayfin-be-${NEW_VERSION} \
+                            ${ECR_REPO}:${NEW_VERSION}
                         """
                     }
+                }
+            }
+        }
+        
+        stage('Update Nginx') {
+            steps {
+                script {
+                    sh """
+                    sudo sed -i 's/proxy_pass http:\\/\\/app_${CURRENT_VERSION};/proxy_pass http:\\/\\/app_${NEW_VERSION};/' /etc/nginx/nginx.conf
+                    sudo systemctl reload nginx
+                    """
                 }
             }
         }
@@ -61,8 +75,8 @@ pipeline {
         stage('Check Application Health') {
             steps {
                 script {
-                    sleep 10
-                    def response = sh(script: "curl -s -o /dev/null -w '%{http_code}' http://localhost:5000/user/healthcheck ", returnStdout: true).trim()
+                    sleep 5
+                    def response = sh(script: "curl -s -o /dev/null -w '%{http_code}' http://localhost:${NEW_PORT}/user/healthcheck ", returnStdout: true).trim()
                     if (response != '200') {
                         error("Application health check failed with response code: ${response}")
                     } else {
