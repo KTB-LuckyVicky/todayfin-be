@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         REPO = 'KTB-LuckyVicky/todayfin-be'
-        ECR_REPO = '851725447172.dkr.ecr.ap-northeast-2.amazonaws.com/todayfin'
+        ECR_REPO = '851725447172.dkr.ecr.ap-northeast-2.amazonaws.com/todayfinpractice'
         ECR_CREDENTIALS_ID = 'ecr:ap-northeast-2:ecr_credentials_id'
     }
 
