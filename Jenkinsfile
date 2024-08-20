@@ -62,7 +62,7 @@ pipeline {
             steps {
                 script {
                     sleep 10
-                    def response = sh(script: "curl -s -o /dev/null -w '%{http_code}' http://localhost:5000/health", returnStdout: true).trim()
+                    def response = sh(script: "curl -s -o /dev/null -w '%{http_code}' http://localhost:5000/", returnStdout: true).trim()
                     if (response != '200') {
                         error("Application health check failed with response code: ${response}")
                     } else {
