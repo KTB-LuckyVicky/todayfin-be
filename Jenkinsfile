@@ -102,5 +102,14 @@ pipeline {
                 }
             }
         }
+      stage('Shutdown Old Version') {  // New stage for shutting down the old version
+            steps {
+                script {
+                    sh """
+                    docker rm -f todayfin-be-${env.CURRENT_VERSION} || true
+                    """
+                }
+            }
+        }
     }
 }
