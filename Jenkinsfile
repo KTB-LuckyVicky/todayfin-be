@@ -82,8 +82,8 @@ pipeline {
             steps {
                 script {
                     sh """
-                    sudo sed -i 's/proxy_pass http:\\/\\/app_${env.CURRENT_VERSION};/proxy_pass http:\\/\\/app_${env.NEW_VERSION};/' /etc/nginx/nginx.conf
-                    sudo systemctl reload nginx
+                    sudo sed -i 's|proxy_pass http://app_${env.CURRENT_VERSION};|proxy_pass http://app_${env.NEW_VERSION};|' /etc/nginx/nginx.conf
+                    sudo nginx -t && sudo systemctl reload nginx
                     """
                 }
             }
