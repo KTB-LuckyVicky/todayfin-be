@@ -107,6 +107,7 @@ pipeline {
                 script {
                     sh """
                     docker rm -f todayfin-be-${env.CURRENT_VERSION} || true
+                    docker image prune -f
                     """
                 }
             }
