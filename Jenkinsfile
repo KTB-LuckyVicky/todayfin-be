@@ -11,21 +11,15 @@ pipeline {
         stage('Set Versions') {
             steps {
                 script {
-                    // 현재 활성화된 버전 (green 또는 blue)을 설정
-                    CURRENT_VERSION = "blue" // 예: "blue"가 현재 배포된 버전일 경우
-
-                    // 다음 배포할 새로운 버전을 설정
+                    def currentVersion = sh(script: "grep -o 'app_\\(green\\|blue\\)' /etc/nginx/nginx.conf | sed 's/app_//'", returnStdout: true).trim()
+                    CURRENT_VERSION = currentVersion ? currentVersion : "blue" // Default to blue if not found
                     NEW_VERSION = CURRENT_VERSION == "green" ? "blue" : "green"
-
-                    // 새로운 버전이 사용할 포트를 설정
                     NEW_PORT = NEW_VERSION == "green" ? "5000" : "5001"
-
-                    // 환경 변수로 설정
+        
                     env.CURRENT_VERSION = CURRENT_VERSION
                     env.NEW_VERSION = NEW_VERSION
                     env.NEW_PORT = NEW_PORT
-                    
-                    // 버전 확인
+        
                     sh """
                     echo "CURRENT_VERSION=${env.CURRENT_VERSION}"
                     echo "NEW_VERSION=${env.NEW_VERSION}"
