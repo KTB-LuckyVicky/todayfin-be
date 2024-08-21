@@ -11,7 +11,7 @@ pipeline {
         stage('Set Versions') {
             steps {
                 script {
-                    def currentVersion = sh(script: "grep -o 'app_\\(green\\|blue\\)' /etc/nginx/nginx.conf | sed 's/app_//'", returnStdout: true).trim()
+                    def currentVersion = sh(script: "grep -o 'app_\\(green\\|blue\\)' /etc/nginx/nginx.conf | tail -n 1 | sed 's/app_//'", returnStdout: true).trim()
                     CURRENT_VERSION = currentVersion ? currentVersion : "blue" // Default to blue if not found
                     NEW_VERSION = CURRENT_VERSION == "green" ? "blue" : "green"
                     NEW_PORT = NEW_VERSION == "green" ? "5000" : "5001"
