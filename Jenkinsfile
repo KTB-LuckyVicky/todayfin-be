@@ -24,6 +24,12 @@ pipeline {
                     env.CURRENT_VERSION = CURRENT_VERSION
                     env.NEW_VERSION = NEW_VERSION
                     env.NEW_PORT = NEW_PORT
+                    
+                    // 버전 확인
+                    sh """
+                    echo "CURRENT_VERSION=${env.CURRENT_VERSION}"
+                    echo "NEW_VERSION=${env.NEW_VERSION}"
+                    """
                 }
             }
         }
