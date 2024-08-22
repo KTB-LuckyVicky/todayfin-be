@@ -31,7 +31,7 @@ router.get('/date', async (req: Request, res: Response) => {
 router.get('/:newsId', async (req: Request, res: Response) => {
     const news = await NewsModel.findById(req.params.newsId)
     const params = [req.params.newsId, req.params.newsId, req.user._id]
-    ;(await conn).query('update User set log = if(log IS NULL, json_array(?), json_merge_preserve(log, json_array(?))) where _id = ?', params)
+    ;(await conn).query('update User set log = if(log IS NULL, json_array(?), json_merge(log, json_array(?))) where _id = ?', params)
     res.status(200).json({
         _id: news._id,
         title: news.title,

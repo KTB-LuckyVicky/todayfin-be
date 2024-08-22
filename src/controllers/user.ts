@@ -22,6 +22,8 @@ router.post('/signup', async (req: Request, res: Response) => {
     const salt = await createSalt()
     const hash = await createHashPasswd(req.body.password, salt)
     const category = JSON.stringify(req.body.category)
+    console.log(category)
+    console.log(req.body.category)
     const params = [req.body.oauthProvider, req.body.oauthId, req.body.nickname, req.body.name, hash, salt, category]
     try {
         ;(await conn).query(
@@ -65,9 +67,9 @@ router.get('/detail', verifyUser, async (req: Request, res: Response) => {
 router.put('/detail', verifyUser, async (req: Request, res: Response) => {
     const hash = await createHashPasswd(req.body.password, req.user.salt)
     const category = JSON.stringify(req.body.category)
-    const params = [req.body.nickname, hash, category]
+    const params = [req.body.nickname, hash, category, req.user._id]
     try {
-        ;(await conn).query('update User set nickname=?, password=?, category=?', params)
+        ;(await conn).query('update User set nickname=?, password=?, category=? where _id=?', params)
     } catch (err) {
         throw new Error('User update fail')
     }
