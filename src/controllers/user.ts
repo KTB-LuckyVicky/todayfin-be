@@ -22,8 +22,6 @@ router.post('/signup', async (req: Request, res: Response) => {
     const salt = await createSalt()
     const hash = await createHashPasswd(req.body.password, salt)
     const category = JSON.stringify(req.body.category)
-    console.log(category)
-    console.log(req.body.category)
     const params = [req.body.oauthProvider, req.body.oauthId, req.body.nickname, req.body.name, hash, salt, category]
     try {
         ;(await conn).query(
