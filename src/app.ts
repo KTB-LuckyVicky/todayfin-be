@@ -28,7 +28,6 @@ import mongoose from 'mongoose'
         socket.on('joinChat', async newsId => {
             socket.join(newsId)
             logger.info(`Socket joined room: ${newsId}`)
-            console.log(newsId)
             const newsObjectId = new mongoose.Types.ObjectId(newsId)
 
             const messages = await ChatModel.find({ newsObjectId }).sort({ createdAt: 1 })
@@ -37,9 +36,6 @@ import mongoose from 'mongoose'
 
         socket.on('message', async msg => {
             const { authorId, newsId, content, createdAt } = msg
-            console.log(newsId)
-            const newsObjectId = new mongoose.Types.ObjectId(newsId)
-            console.log(newsObjectId)
             const chatMessage = new ChatModel({
                 authorId,
                 newsId,
