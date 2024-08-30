@@ -57,7 +57,7 @@ export class News extends TimeStamps {
             author: this.author,
             embedding: this.embedding,
         }
-    }3
+    }
 
     public static async findById(this: ReturnModelType<typeof News>, newsId: string): Promise<News> {
         const news = await this.findOne({ _id: newsId })
