@@ -36,7 +36,9 @@ router.get('/', async (req: Request, res: Response) => {
 })
 
 router.get('/:postId', verifyUser, verifyPostAuthor, async (req: Request, res: Response) => {
-    const post = await (await conn).query('select * from Post where _id = ?', req.params.postId)
+    const post = await (
+        await conn
+    ).query('select Post.*, User.nickname from Post  join User on Post.authorId = User._id where Post._id= ?', req.params.postId)
     res.json(post[0])
 })
 
