@@ -6,8 +6,6 @@ import { conn } from '@/config'
 
 const router: Router = express.Router()
 
-router.use(verifyUser)
-
 router.get('/date', async (req: Request, res: Response) => {
     const page = Number(req.query.page || 1)
     const limit = Number(req.query.size || 6)
@@ -28,10 +26,14 @@ router.get('/date', async (req: Request, res: Response) => {
     })
 })
 
-router.get('/:newsId', async (req: Request, res: Response) => {
+router.get('/:newsId', verifyUser, async (req: Request, res: Response) => {
     const news = await NewsModel.findById(req.params.newsId)
-    const params = [req.params.newsId, req.params.newsId, req.user._id]
-    ;(await conn).query('update User set log = if(log IS NULL, json_array(?), json_merge(log, json_array(?))) where _id = ?', params)
+    const params = [req.params.newsId, req.params.newsId, req.params.newsId, req.user._id]
+
+    ;(await conn).query(
+        "UPDATE User SET log = IF(log IS NULL, JSON_ARRAY(?), IF(JSON_SEARCH(log, 'one', ?) IS NULL, JSON_ARRAY_APPEND(log, '$', ?), log)) WHERE _id = ?",
+        params,
+    )
     res.status(200).json({
         _id: news._id,
         title: news.title,
@@ -69,7 +71,7 @@ router.get('/date/:category', async (req: Request, res: Response) => {
     })
 })
 
-router.get('/:newsId/article', async (req: Request, res: Response) => {
+router.get('/:newsId/article', verifyUser, async (req: Request, res: Response) => {
     const news = await NewsModel.findById(req.params.newsId)
     res.status(200).json({
         article: news.article,

@@ -55,10 +55,13 @@ router.post('/signin', async (req: Request, res: Response) => {
 
 router.get('/detail', verifyUser, async (req: Request, res: Response) => {
     res.status(200).json({
+        _id: req.user._id,
+        oauthProvider: req.user.oauthProvider,
         oauthId: req.user.oauthId,
         nickname: req.user.nickname,
         name: req.user.name,
         category: req.user.category,
+        log: req.user.log,
     })
 })
 
