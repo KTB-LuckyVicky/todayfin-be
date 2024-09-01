@@ -5,9 +5,7 @@ import { verifyUser } from '@/middlewares/user'
 
 const router: Router = express.Router()
 
-router.use(verifyUser)
-
-router.post('/', async (req: Request, res: Response) => {
+router.post('/', verifyUser, async (req: Request, res: Response) => {
     const params = [req.body.title, req.body.content, req.user._id]
     try {
         ;(await conn).query('insert into Post (title, content, authorId) values (?, ?, ?)', params)
@@ -21,7 +19,12 @@ router.get('/', async (req: Request, res: Response) => {
     const page = Number(req.query.page || 1)
     const limit = Number(req.query.size || 20)
     const offset = (page - 1) * limit
-    const posts = await (await conn).query('select * from Post limit ? offset ?', [limit, offset])
+    const posts = await (
+        await conn
+    ).query('select Post.*, User.nickname from Post  join User on Post.authorId = User._id order by Post.createdAt DESC limit ? offset ?', [
+        limit,
+        offset,
+    ])
 
     res.status(200).json({
         posts: posts,
@@ -32,12 +35,12 @@ router.get('/', async (req: Request, res: Response) => {
     })
 })
 
-router.get('/:postId', async (req: Request, res: Response) => {
+router.get('/:postId', verifyUser, verifyPostAuthor, async (req: Request, res: Response) => {
     const post = await (await conn).query('select * from Post where _id = ?', req.params.postId)
     res.json(post[0])
 })
 
-router.put('/:postId', verifyPostAuthor, async (req: Request, res: Response) => {
+router.put('/:postId', verifyUser, verifyPostAuthor, async (req: Request, res: Response) => {
     const params = [req.body.title, req.body.content, req.params.postId]
     try {
         ;(await conn).query('update Post set title=?, content=? where _id=?', params)
@@ -47,7 +50,7 @@ router.put('/:postId', verifyPostAuthor, async (req: Request, res: Response) => 
     res.sendStatus(204)
 })
 
-router.delete('/:postId', verifyPostAuthor, async (req: Request, res: Response) => {
+router.delete('/:postId', verifyUser, verifyPostAuthor, async (req: Request, res: Response) => {
     try {
         ;(await conn).query('delete from Post where _id=?', req.post._id)
     } catch (error) {
