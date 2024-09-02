@@ -6,7 +6,7 @@ import { conn } from '@/config'
 
 const router: Router = express.Router()
 
-router.get('/date', async (req: Request, res: Response) => {
+router.post('/date', async (req: Request, res: Response) => {
     const page = Number(req.query.page || 1)
     const limit = Number(req.query.size || 6)
     const date = req.body.date
@@ -50,7 +50,7 @@ router.get('/:newsId', verifyUser, async (req: Request, res: Response) => {
     })
 })
 
-router.get('/date/:category', async (req: Request, res: Response) => {
+router.post('/date/:category', async (req: Request, res: Response) => {
     const page = Number(req.query.page || 1)
     const limit = Number(req.query.size || 6)
     const date = req.body.date
