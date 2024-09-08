@@ -18,8 +18,8 @@ import mongoose from 'mongoose'
     })
 
     api.listen()
-    server.listen(5001, () => {
-        logger.info(`Http server is running on port 5001`)
+    server.listen(5002, () => {
+        logger.info(`Https server is running on port 5002`)
     })
 
     io.on('connection', socket => {
