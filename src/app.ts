@@ -18,7 +18,7 @@ import mongoose from 'mongoose'
     })
 
     api.listen()
-    server.listen(5002, () => {
+    server.listen(5002, '0,0,0,0', () => {
         logger.info(`Https server is running on port 5002`)
     })
 
