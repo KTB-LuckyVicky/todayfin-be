@@ -2,13 +2,13 @@ import * as db from './models/connector'
 import API from './api'
 import { logger } from './utils/logger'
 import { Server } from 'socket.io'
-import * as http from 'http'
+import * as https from 'https'
 import { ChatModel } from '@/models'
 import mongoose from 'mongoose'
 ;(async () => {
     await db.connect()
     const api = new API()
-    const server = http.createServer(api.app)
+    const server = https.createServer(api.app)
     const io = new Server(server, {
         cors: {
             origin: 'http://localhost:3000', // 프론트엔드 주소
