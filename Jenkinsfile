@@ -11,8 +11,8 @@ pipeline {
         stage('Set Versions') {
             steps {
                 script {
-                    def currentVersion = sh(script: "grep -o 'app_\\(green\\|blue\\)' /etc/nginx/nginx.conf | tail -n 1 | sed 's/app_//'", returnStdout: true).trim()
-                    CURRENT_VERSION = currentVersion ? currentVersion : "blue" // Default to blue if not found
+                    def currentVersion = sh(script: "grep -o 'server.*500[0-1]' /etc/nginx/conf.d/upstream.conf | grep -o '500[0-1]' | tail -n 1", returnStdout: true).trim()
+                    CURRENT_VERSION = currentVersion == "5000" ? "green" : "blue"
                     NEW_VERSION = CURRENT_VERSION == "green" ? "blue" : "green"
                     NEW_PORT = NEW_VERSION == "green" ? "5000" : "5001"
         
@@ -82,7 +82,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                    sudo sed -i 's|proxy_pass http://app_${env.CURRENT_VERSION};|proxy_pass http://app_${env.NEW_VERSION};|' /etc/nginx/nginx.conf
+                    sudo sed -i 's|server 43.201.82.230:${env.CURRENT_PORT};|server 43.201.82.230:${env.NEW_PORT};|' /etc/nginx/conf.d/upstream.conf
                     sudo systemctl reload nginx
                     """
                 }
@@ -102,7 +102,7 @@ pipeline {
                 }
             }
         }
-      stage('Shutdown Old Version') {  // New stage for shutting down the old version
+      stage('Shutdown Old Version') {
             steps {
                 script {
                     sh """
