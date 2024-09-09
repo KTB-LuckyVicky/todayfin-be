@@ -10,7 +10,7 @@ import { ChatModel } from '@/models'
 
 export default class API {
     app: express.Application
-    server: http.Server
+    server: https.Server
     io: SocketIOServer
 
     constructor() {
@@ -18,7 +18,7 @@ export default class API {
         this.server = http.createServer(this.app)
         this.io = new SocketIOServer(this.server, {
             cors: {
-                origin: 'http://localhost:3000', // 클라이언트 주소에 맞게 수정
+                origin: 'https://todayfin.site',
                 methods: ['GET', 'POST'],
             },
         })
