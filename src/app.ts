@@ -4,7 +4,6 @@ import { logger } from './utils/logger'
 import { Server } from 'socket.io'
 import * as https from 'https'
 import { ChatModel } from '@/models'
-import mongoose from 'mongoose'
 ;(async () => {
     await db.connect()
     const api = new API()
@@ -28,9 +27,8 @@ import mongoose from 'mongoose'
         socket.on('joinChat', async newsId => {
             socket.join(newsId)
             logger.info(`Socket joined room: ${newsId}`)
-            const newsObjectId = new mongoose.Types.ObjectId(newsId)
 
-            const messages = await ChatModel.find({ newsObjectId }).sort({ createdAt: 1 })
+            const messages = await ChatModel.find({ newsId }).sort({ createdAt: 1 })
             socket.emit('messageList', messages)
         })
 
