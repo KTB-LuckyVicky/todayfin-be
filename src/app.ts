@@ -11,7 +11,7 @@ import mongoose from 'mongoose'
     const server = https.createServer(api.app)
     const io = new Server(server, {
         cors: {
-            origin: 'http://localhost:3000', // 프론트엔드 주소
+            origin: 'https://todayfin.site', // 프론트엔드 주소
             methods: ['GET', 'POST'],
             credentials: true,
         },
