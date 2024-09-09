@@ -67,7 +67,7 @@ export default class API {
                 })
                 await chatMessage.save()
                 logger.info(`Message received in room ${newsId}: ${content}`)
-                this.io.to(newsId).emit('message', content)
+                this.io.to(newsId).emit('message', chatMessage)
             })
 
             socket.on('disconnect', () => {
