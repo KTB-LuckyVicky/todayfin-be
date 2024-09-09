@@ -10,7 +10,7 @@ import { ChatModel } from '@/models'
 
 export default class API {
     app: express.Application
-    server: https.Server
+    server: http.Server
     io: SocketIOServer
 
     constructor() {
@@ -18,7 +18,7 @@ export default class API {
         this.server = http.createServer(this.app)
         this.io = new SocketIOServer(this.server, {
             cors: {
-                origin: 'https://todayfin.site',
+                origin: ['https://todayfin.site', /^https:\/\/.*\.todayfin\.site$/],
                 methods: ['GET', 'POST'],
             },
         })
