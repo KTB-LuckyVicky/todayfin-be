@@ -63,6 +63,7 @@ pipeline {
                         
                         sh """
                         docker run -d -p ${env.NEW_PORT}:5000 \
+                            -p 5002:5002 \
                             -e MARIADB_HOST=${MARIADB_HOST} \
                             -e MARIADB_PASSWORD=${MARIADB_PASSWORD} \
                             -e MARIADB_USER=${MARIADB_USER} \
