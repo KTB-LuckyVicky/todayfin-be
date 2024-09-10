@@ -66,13 +66,17 @@ router.get('/detail', verifyUser, async (req: Request, res: Response) => {
 })
 
 router.put('/detail', verifyUser, async (req: Request, res: Response) => {
-    const hash = await createHashPasswd(req.body.password, req.user.salt)
-    const category = JSON.stringify(req.body.category)
-    const params = [req.body.nickname, hash, category, req.user._id]
-    try {
-        ;(await conn).query('update User set nickname=?, password=?, category=? where _id=?', params)
-    } catch (err) {
-        throw new Error('User update fail')
+    const inputHash = await createHashPasswd(req.body.password, req.user.salt)
+    if (inputHash === req.user.password) {
+        const hash = await createHashPasswd(req.body.newPassword, req.user.salt)
+        const params = [hash, req.user._id]
+        try {
+            ;(await conn).query('update User set password=? where _id=?', params)
+        } catch (err) {
+            throw new Error('User update fail')
+        }
+    } else {
+        res.sendStatus(401)
     }
     res.sendStatus(204)
 })
