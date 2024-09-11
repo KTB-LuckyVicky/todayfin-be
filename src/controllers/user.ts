@@ -42,7 +42,7 @@ router.post('/signup', async (req: Request, res: Response) => {
 
 router.post('/signin', async (req: Request, res: Response) => {
     const row = await (await conn).query('select * from User where oauthId=?', [req.body.oauthId])
-    if (row != null) {
+    if (row[0] != undefined) {
         const user = row[0]
         const salt = user.salt
         const storedHash = user.password
@@ -55,7 +55,7 @@ router.post('/signin', async (req: Request, res: Response) => {
             res.sendStatus(401)
         }
     } else {
-        throw new Error('Can not find user')
+        res.sendStatus(401)
     }
 })
 
